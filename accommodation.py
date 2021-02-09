@@ -6,13 +6,19 @@ import pandas as pd
 import psycopg2
 conn_string = "host='localhost' dbname = 'postgres' user = 'postgres' password = '1029'"
 
+# conn = psycopg2.connect(conn_string)
+# cur = conn.cursor()
+#
 # cur.execute("CREATE TABLE accommodation (place_confirmid VARCHAR(30) PRIMARY KEY, place_name VARCHAR(100), place_x INTEGER, place_y INTEGER, place_address VARCHAR(100), place_tel VARCHAR(20), place_rating_avg INTEGER);")
 # conn.commit()
-
-# cur.execute("CREATE TABLE accommodation_review (place_confirmid VARCHAR(20), review_point INTEGER, review_contents VARCHAR);")
+#
+# cur.execute("CREATE TABLE accommodation_review (place_confirmid VARCHAR(20), review_id VARCHAR(20), review_date DATE, review_point INTEGER, review_contents VARCHAR);")
 # conn.commit()
+#
+# cur.close()
+# conn.close()
 
-addr_xls = pd.read_excel('강원도_강릉시_도로명.xls', header=1)
+addr_xls = pd.read_excel('강원도/강원도_강릉시_도로명.xls', header=1)
 
 exitOuterLoop = False
 
@@ -42,6 +48,7 @@ for addr in addr_xls['도로명']:
                         place['confirmid'], place['name'], place['x'], place['y'],
                         place['address'], place['tel'], place['rating_average']))
                 conn.commit()
+                print(place['confirmid'])
             except Exception as ex:
                 print(ex)
                 exitOuterLoop = True
@@ -58,10 +65,10 @@ for addr in addr_xls['도로명']:
                     json_tmp = json.loads(response.text)
                     review_list = json_tmp['comment']['list']
 
-                    review_point = -1
-                    review_contents = ""
                     for review in review_list:
                         review_point = review['point']
+                        review_id = review['commentid']
+                        review_date = review['date']
                         try:
                             if review['contents'] == "":
                                 if review['point'] == 0:
@@ -69,7 +76,7 @@ for addr in addr_xls['도로명']:
                                 elif review['point'] == 1:
                                     review_contents = '별로'
                                 elif review['point'] == 2:
-                                    review_contents = '별로'
+                                    review_contents = '조금 아쉬워요'
                                 elif review['point'] == 3:
                                     review_contents = '보통이에요'
                                 elif review['point'] == 4:
@@ -84,7 +91,7 @@ for addr in addr_xls['도로명']:
                             elif review['point'] == 1:
                                 review_contents = '별로'
                             elif review['point'] == 2:
-                                review_contents = '별로'
+                                review_contents = '조금 아쉬워요'
                             elif review['point'] == 3:
                                 review_contents = '보통이에요'
                             elif review['point'] == 4:
@@ -92,8 +99,8 @@ for addr in addr_xls['도로명']:
                             else:
                                 review_contents = '최고예요'
 
-                        cur.execute("INSERT into accommodation_review(place_confirmid, review_point, review_contents) values (%s, %s, %s);",(
-                                place['confirmid'], review_point, review_contents))
+                        cur.execute("INSERT into accommodation_review(place_confirmid, review_id, review_date, review_point, review_contents) values (%s, %s, %s, %s, %s);",(
+                                place['confirmid'], review_id, review_date, review_point, review_contents))
                         conn.commit()
                 except:
                     # print("end_review")
