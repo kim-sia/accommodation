@@ -7,8 +7,8 @@ conn_string = "host='localhost' dbname = 'postgres' user = 'postgres' password =
 conn = psycopg2.connect(conn_string)
 cur = conn.cursor()
 
-cur.execute("ALTER TABLE accommodation_review ADD preprocessed_review varchar;")
-conn.commit()
+# cur.execute("ALTER TABLE accommodation_review ADD preprocessed_review varchar;")
+# conn.commit()
 
 # Basic Preprocessing
 review_tokenized_contents = []
@@ -51,19 +51,18 @@ def clean_text(texts):
     # for i in range(0, len(texts)):
     # review = re.sub(r'[@%\\*=()/~#&\+á?\xc3\xa1\-\|\.\:\;\!\-\,\_\~\$\'\"]', '',str(texts[i])) #remove punctuation
 
-    review = re.sub(r'[@%\\*=()/~#&\+á?\xc3\xa1\-\|\.\:\;\!\-\,\_\~\$\'\"]', '',str(texts)) #remove punctuation
+    review = re.sub(r'[@%\\*=()/~#&\+á?^♡★♥☕🍵🍰☎🔥🍺🍽●\xc3\xa1\-\|\.\:\;\!\-\,\_\~\$\'\"\[\]]', '',str(texts)) #remove punctuation
     # review = re.sub(r'\d+','', str(texts[i]))# remove number
-    review = re.sub(r'\d+', '', str(texts))  # remove number
+    review = re.sub(r'\d+', '', review)  # remove number
     review = review.lower() #lower case
     review = re.sub(r'\s+', ' ', review) #remove extra space
     review = re.sub(r'<[^>]+>','',review) #remove Html tags
+    review = re.sub(r'[<>]', '', review)
     review = re.sub(r'\s+', ' ', review) #remove spaces
     review = re.sub(r"^\s+", '', review) #remove space from start
     review = re.sub(r'\s+$', '', review) #remove space from the end
     corpus.append(review)
     return corpus
-
-
 
 # Spell check
 
@@ -104,8 +103,7 @@ def spell_check_text(texts):
                 normalized_sent = normalized_sent.replace(lownword, lownword_map[lownword])
             corpus.append(normalized_sent)
         except Exception as ex:
-            print(ex, sent)
-            corpus.append(sent)
+            print(ex)
     return corpus
 
 for content in cleaned_corpus:
@@ -113,7 +111,6 @@ for content in cleaned_corpus:
     spell_preprocessed_corpus = spell_check_text(basic_preprocessed_corpus)
     cur.execute("SELECT count(*) FROM accommodation_review WHERE place_confirmid = %s AND review_id = %s AND preprocessed_review IS NULL;",(content[0], content[1]))
     is_null = cur.fetchone()[0]
-    # print(content[0], content[1], is_null)
     if is_null:
         cur.execute("UPDATE accommodation_review SET preprocessed_review = %s WHERE place_confirmid = %s AND review_id = %s;",(''.join(spell_preprocessed_corpus), content[0], content[1]))
     else:
