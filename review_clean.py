@@ -42,16 +42,15 @@ def clean_punc(text, punct, mapping):
 
 cleaned_corpus = []
 for content in review_tokenized_contents:
-    content[2] = re.sub('(http|ftp|https)://(?:[-\w.]|(?:\da-fA-F]{2}))+','', content[2]) # remove url pattern
+    # content[2] = re.sub('(http|ftp|https)://(?:[-\w.]|(?:\da-fA-F]{2}))+', '', content[2])  # remove url pattern
     tuple_tmp = (content[0], content[1])
     cleaned_corpus.append(list(tuple_tmp + tuple([clean_punc(content[2], punct, punct_mapping)])))
-
 
 def clean_text(texts):
     corpus = []
     # for i in range(0, len(texts)):
     # review = re.sub(r'[@%\\*=()/~#&\+á?\xc3\xa1\-\|\.\:\;\!\-\,\_\~\$\'\"]', '',str(texts[i])) #remove punctuation
-    review = re.sub(r'[@%\\*=()/~#&\+á?^♡★♥☕🍵🍰☎🔥🍺🍽●･̑◡ᆢ▷▶☞\xc3\xa1\-\|\.\:\;\!\-\,\_\~\$\'\"\[\]]', '', str(texts))  # remove punctuation
+    review = re.sub(r'[@%\\*=()/~#&\+á?^♡★♥☕🍵🍰☎🔥🍺🍽●･̑◡ᆢ▷▶☞\xc3\xa1\-\|\.\:\;\!\-\,\_\~\$\'\"\[\]]', '', str(texts)) #remove punctuation
     # review = re.sub(r'\d+','', str(texts[i]))# remove number
     review = re.sub(r'\d+', '', review)  # remove number
     review = review.lower() #lower case
@@ -63,6 +62,9 @@ def clean_text(texts):
     review = re.sub(r'\s+$', '', review) #remove space from the end
     corpus.append(review)
     return corpus
+
+for content in cleaned_corpus:
+    basic_preprocessed_corpus = clean_text(content[2])
 
 # Spell check
 
@@ -118,6 +120,7 @@ for content in cleaned_corpus:
         tmp = cur.fetchone()[0]
         cur.execute("UPDATE accommodation_review SET preprocessed_review = %s WHERE place_confirmid = %s AND review_id = %s;",(tmp, content[0], content[1]))
     conn.commit()
+    print("for end")
 
 cur.close()
 conn.close()
