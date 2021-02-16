@@ -2,7 +2,7 @@ import psycopg2
 import re
 
 # db 연결
-conn_string = "host='172.30.1.29' dbname = 'siadb' user = 'sia' password = '1029'"
+conn_string = "host='localhost' dbname = 'postgres' user = 'postgres' password = '1029'"
 conn = psycopg2.connect(conn_string)
 cur = conn.cursor()
 
