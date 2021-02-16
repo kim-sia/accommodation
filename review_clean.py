@@ -50,7 +50,7 @@ def clean_text(texts):
     corpus = []
     # for i in range(0, len(texts)):
     # review = re.sub(r'[@%\\*=()/~#&\+á?\xc3\xa1\-\|\.\:\;\!\-\,\_\~\$\'\"]', '',str(texts[i])) #remove punctuation
-    review = re.sub(r'[@%\\*=()/~#&\+á?^♡★♥☕🍵🍰☎🔥🍺🍽●･̑◡ᆢ▷▶☞\xc3\xa1\-\|\.\:\;\!\-\,\_\~\$\'\"\[\]]', '', str(texts)) #remove punctuation
+    review = re.sub(r'[@%\\*＊=()/~～#&\+á?^○♡❤♥❣☆★☕🍵♨🍰☎☏🔥🍺🍽●･̑◡ᆢ‥━˃̵ᴗ˂̵▽▷▶☞ℹ✌ᆞㆍ❗⊙▽☺♀♩♪◆◇■❌😍☺└＾┐♫👪※👍₩≥∀≤♠♬↓，ㅡ\xc3\xa1\-\|\.\:\;\!\-\,\_\~\$\'\"\[\]]', '', str(texts)) #remove punctuation
     # review = re.sub(r'\d+','', str(texts[i]))# remove number
     review = re.sub(r'\d+', '', review)  # remove number
     review = review.lower() #lower case
@@ -63,8 +63,6 @@ def clean_text(texts):
     corpus.append(review)
     return corpus
 
-for content in cleaned_corpus:
-    basic_preprocessed_corpus = clean_text(content[2])
 
 # Spell check
 
@@ -124,3 +122,4 @@ for content in cleaned_corpus:
 
 cur.close()
 conn.close()
+
